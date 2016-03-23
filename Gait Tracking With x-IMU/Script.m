@@ -7,7 +7,7 @@ addpath('ximu_matlab_library');
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-fname = 'Datasets\motionprotocol';
+fname = 'Datasets\motionprotocol2';
 fid = fopen(fname);
 raw = fread(fid,inf);
 str = char(raw');
@@ -35,7 +35,7 @@ else
     time = zeros(size(data.gyroscope_data.data));
 end
 %samplingRate = data.accelerometer_data.sampling_rate;
-samplingRate=18;
+samplingRate=100;
 samplePeriod = 1/samplingRate;
 [m,length] = size(time);
 gyrX = zeros(size(time));
@@ -85,7 +85,7 @@ gyrZ=transpose(gyrZ);
 % Manually frame data
 
  startTime = 0;
- stopTime = 55;
+ stopTime = 53;
  
 indexSel = find(sign(time-startTime)+1, 1) : find(sign(time-stopTime)+1, 1);
 time = time(indexSel);
