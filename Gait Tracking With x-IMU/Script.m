@@ -7,7 +7,7 @@ addpath('ximu_matlab_library');
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-fname = 'Datasets\testdata2';
+fname = 'Datasets\motionprotocol';
 fid = fopen(fname);
 raw = fread(fid,inf);
 str = char(raw');
@@ -29,12 +29,13 @@ data = JSON.parse(str);
 
 % -------------------------------------------------------------------------
 % Import data
-if(size(data.accelerometer_data.data)<size(data.gyroscope_data.data))
+if(max(size(data.accelerometer_data.data))<max(size(data.gyroscope_data.data)))
     time = zeros(size(data.accelerometer_data.data));
 else
     time = zeros(size(data.gyroscope_data.data));
 end
-samplingRate = data.accelerometer_data.sampling_rate;
+%samplingRate = data.accelerometer_data.sampling_rate;
+samplingRate=18;
 samplePeriod = 1/samplingRate;
 [m,length] = size(time);
 gyrX = zeros(size(time));
@@ -84,7 +85,7 @@ gyrZ=transpose(gyrZ);
 % Manually frame data
 
  startTime = 0;
- stopTime = 1;
+ stopTime = 55;
  
 indexSel = find(sign(time-startTime)+1, 1) : find(sign(time-stopTime)+1, 1);
 time = time(indexSel);
@@ -149,7 +150,7 @@ linkaxes(ax,'x');
 % Compute orientation
 
 quat = zeros(max(size(time)), 4);
-AHRSalgorithm = AHRS('SamplePeriod', 1/1000, 'Kp', 1, 'KpInit', 1);
+AHRSalgorithm = AHRS('SamplePeriod', 1/100, 'Kp', 1, 'KpInit', 1);
 
 % Initial convergence
 initPeriod = 2;
