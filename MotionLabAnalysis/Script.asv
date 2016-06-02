@@ -5,7 +5,7 @@ clc;
 %% -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-fname = 'Datasets\motionprotocol2';
+fname = 'Datasets\Left';
 fid = fopen(fname);
 raw = fread(fid,inf);
 str = char(raw');
@@ -13,7 +13,7 @@ fclose(fid);
 
 left_data = JSON.parse(str);
 
-fname = 'Datasets\motionprotocol';
+fname = 'Datasets\Right';
 fid = fopen(fname);
 raw = fread(fid,inf);
 str = char(raw');
@@ -45,8 +45,8 @@ end
 samplingRate=100;
 samplePeriod = 1/samplingRate;
 [m,length] = size(time);
-[gyrXL,gyrYL,gyrZL,gyrXR,gyrYR,gyrZR] = zeros(size(time));
-[accXL,accYL,accZL,accXR,accYR,accZR] = zeros(size(time));
+[gyrXL,gyrYL,gyrZL,gyrXR,gyrYR,gyrZR] = deal(zeros(size(time)));
+[accXL,accYL,accZL,accXR,accYR,accZR] = deal(zeros(size(time)));
 
 for i=1:length
     time(i)=(samplePeriod)*i;
@@ -75,7 +75,7 @@ accYL=transpose(accYL);
 accZL=transpose(accZL);
 gyrXL=transpose(gyrXL);
 gyrYL=transpose(gyrYL);
-gyrLZ=transpose(gyrZL);
+gyrZL=transpose(gyrZL);
 accXR=transpose(accXR);
 accYR=transpose(accYR);
 accZR=transpose(accZR);
@@ -99,8 +99,8 @@ gyrZR=transpose(gyrZR);
 %% -------------------------------------------------------------------------
 % Manually frame data
 
- startTime = 0;
- stopTime = 53;
+ startTime = 10;
+ stopTime = 60;
  
 indexSel = find(sign(time-startTime)+1, 1) : find(sign(time-stopTime)+1, 1);
 time = time(indexSel);
@@ -130,8 +130,8 @@ filtCutOff = 0.001;
 accL_magFilt = filtfilt(b, a, accL_mag);
 accR_magFilt = filtfilt(b, a, accR_mag);
 % Compute absolute value
-acc_magFilt = abs(acc_magFilt);
-acc_magFilt = abs(acc_magFilt);
+accL_magFilt = abs(accL_magFilt);
+accR_magFilt = abs(accR_magFilt);
 % LP filter accelerometer data
 filtCutOff = 5;
 [b, a] = butter(1, (2*filtCutOff)/(1/samplePeriod), 'low');
@@ -142,34 +142,79 @@ accL_magFilt = filtfilt(b, a, accL_magFilt);
 stationaryR = accR_magFilt < 0.05;
 stationaryL = accL_magFilt < 0.05;
 
+% Integrating Magnitude
+avg_accL_mag = cumtrapz(accL_mag);
+avg_accR_mag = cumtrapz(accR_mag);
+
 %% -------------------------------------------------------------------------
 % Plot data raw sensor data and stationary periods
 
 figure('Position', [9 39 900 600], 'NumberTitle', 'off', 'Name', 'Sensor Data');
 ax(1) = subplot(2,1,1);
     hold on;
-    plot(time, gyrX, 'r');
-    plot(time, gyrY, 'g');
-    plot(time, gyrZ, 'b');
-    title('Gyroscope');
+    plot(time, accL_mag);
+    title('Magnitude Left Leg');
     xlabel('Time (s)');
-    ylabel('Angular velocity (^\circ/s)');
-    legend('X', 'Y', 'Z');
+    ylabel('Magnitude (g)');
     hold off;
 ax(2) = subplot(2,1,2);
     hold on;
-    plot(time, accX, 'r');
-    plot(time, accY, 'g');
-    plot(time, accZ, 'b');
-    plot(time, acc_magFilt, ':k');
-    plot(time, stationary, 'k', 'LineWidth', 2);
-    title('Accelerometer');
+    plot(time, accR_mag);
+    title('Magnitude Right Leg');
     xlabel('Time (s)');
-    ylabel('Acceleration (g)');
-    legend('X', 'Y', 'Z', 'Filtered', 'Stationary');
+    ylabel('Magnitude (g)');
     hold off;
 linkaxes(ax,'x');
 
+% figure('Position', [9 39 900 600], 'NumberTitle', 'off', 'Name', 'Sensor Data');
+% ax(1) = subplot(2,1,1);
+%     hold on;
+%     plot(time, gyrXL, 'r');
+%     plot(time, gyrYL, 'g');
+%     plot(time, gyrZL, 'b');
+%     title('Gyroscope');
+%     xlabel('Time (s)');
+%     ylabel('Angular velocity (^\circ/s)');
+%     legend('X', 'Y', 'Z');
+%     hold off;
+% ax(2) = subplot(2,1,2);
+%     hold on;
+%     plot(time, accXL, 'r');
+%     plot(time, accYL, 'g');
+%     plot(time, accZL, 'b');
+%     plot(time, accL_magFilt, ':k');
+%     plot(time, stationaryL, 'k', 'LineWidth', 2);
+%     title('Accelerometer');
+%     xlabel('Time (s)');
+%     ylabel('Acceleration (g)');
+%     legend('X', 'Y', 'Z', 'Filtered', 'Stationary');
+%     hold off;
+% linkaxes(ax,'x');
+% 
+% figure('Position', [9 39 900 600], 'NumberTitle', 'off', 'Name', 'Sensor Data');
+% ax(1) = subplot(2,1,1);
+%     hold on;
+%     plot(time, gyrXR, 'r');
+%     plot(time, gyrYR, 'g');
+%     plot(time, gyrZR, 'b');
+%     title('Gyroscope');
+%     xlabel('Time (s)');
+%     ylabel('Angular velocity (^\circ/s)');
+%     legend('X', 'Y', 'Z');
+%     hold off;
+% ax(2) = subplot(2,1,2);
+%     hold on;
+%     plot(time, accXR, 'r');
+%     plot(time, accYR, 'g');
+%     plot(time, accZR, 'b');
+%     plot(time, accR_magFilt, ':k');
+%     plot(time, stationaryR, 'k', 'LineWidth', 2);
+%     title('Accelerometer');
+%     xlabel('Time (s)');
+%     ylabel('Acceleration (g)');
+%     legend('X', 'Y', 'Z', 'Filtered', 'Stationary');
+%     hold off;
+% linkaxes(ax,'x');
 % % -------------------------------------------------------------------------
 % % Compute orientation
 % 
