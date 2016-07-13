@@ -1,0 +1,10 @@
+Duration: 55 seconds
+5 seconds still
+5 seconds walk straight line and rotate 180 degrees at end
+5 seconds still
+5 seconds walk straight line and rotate 180 degrees at end
+5 seconds still
+5 seconds walk straight 5 seconds turn right and walk and rotate 180 degrees at end 
+5 seconds still
+5 seconds walk straight 5 seconds turn left and walk and stop 
+5 seconds still

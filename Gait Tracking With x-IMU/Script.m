@@ -1,3 +1,4 @@
+%%
 clear;
 close all;
 clc;
@@ -7,7 +8,7 @@ addpath('ximu_matlab_library');
 % -------------------------------------------------------------------------
 % Select dataset (comment in/out)
 
-fname = 'Datasets\motionprotocol2';
+fname = 'Datasets\motion 2';
 fid = fopen(fname);
 raw = fread(fid,inf);
 str = char(raw');
@@ -51,9 +52,9 @@ end
 
 for i=1:length
     
-accX(i) = data.accelerometer_data.data{1,i}{1,1}/2;
-accY(i) = data.accelerometer_data.data{1,i}{1,2}/2;
-accZ(i) = data.accelerometer_data.data{1,i}{1,3}/2;
+accX(i) = data.accelerometer_data.data{1,i}{1,1};
+accY(i) = data.accelerometer_data.data{1,i}{1,2};
+accZ(i) = data.accelerometer_data.data{1,i}{1,3};
 gyrX(i) = data.gyroscope_data.data{1,i}{1,1};
 gyrY(i) = data.gyroscope_data.data{1,i}{1,2};
 gyrZ(i) = data.gyroscope_data.data{1,i}{1,3};
@@ -85,7 +86,7 @@ gyrZ=transpose(gyrZ);
 % Manually frame data
 
  startTime = 0;
- stopTime = 53;
+ stopTime = 60;
  
 indexSel = find(sign(time-startTime)+1, 1) : find(sign(time-stopTime)+1, 1);
 time = time(indexSel);
@@ -177,7 +178,7 @@ end
 acc = quaternRotate([accX accY accZ], quaternConj(quat));
 
 % % Remove gravity from measurements
-% acc = acc - [zeros(length(time), 2) ones(length(time), 1)];     % unnecessary due to velocity integral drift compensation
+%acc = acc - [zeros(max(size(time)), 2) ones(max(size(time)), 1)];     % unnecessary due to velocity integral drift compensation
 
 % Convert acceleration measurements to m/s/s
 acc = acc * 9.81;
@@ -198,6 +199,7 @@ hold off;
 % Compute translational velocities
 
 acc(:,3) = acc(:,3) - 9.81;
+%acc(:,3) = 0;
 
 % Integrate acceleration to yield velocity
 vel = zeros(size(acc));
@@ -255,7 +257,7 @@ xlabel('Time (s)');
 ylabel('Position (m)');
 legend('X', 'Y', 'Z');
 hold off;
-
+%%
 % -------------------------------------------------------------------------
 % Plot 3D foot trajectory
 
